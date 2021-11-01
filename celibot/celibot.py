@@ -52,13 +52,14 @@ def start(message):
     buttonRestartTimer = types.InlineKeyboardButton('🔄 Сбросить таймер')
     buttonCheck = types.InlineKeyboardButton('🔎 Проверить')
     buttonStats = types.InlineKeyboardButton('📊 Общая статистика')
-    buttonHelp = types.InlineKeyboardButton('❓ Справка')
+#старт итак выводит справку, убрал во избежание рекурсии =)
+#    buttonHelp = types.InlineKeyboardButton('❓ Справка')
 
     markup.row(buttonStartTimer, buttonRestartTimer)
     markup.row(buttonCheck, buttonStats)
     markup.row(buttonHelp)
 
-    bot.send_message(message.chat.id, f'Меню:\n{info}', reply_markup=markup)
+    bot.send_message(message.chat.id, info, reply_markup=markup)
 
 @bot.message_handler(commands=['start_timer'])
 def start_timer(message):
@@ -89,13 +90,15 @@ def check(message):
 @bot.message_handler(commands=['statistics'])
 def statistics(message):
     bot.reply_to(message, 'Всего участников: {}\nВыдержало: {}  ({})'.format(*count_user()))
-	
-info="""
+
+#Справка не должна начинать с команды, иначе при вызове боты через inline будет повторный вызов команды 
+info="""Доступные команды:
 /start - меню;
 /start_timer - запустить счётчик;
 /reset_timer - обнулить дни;
 /check - проверить количество дней;
 /statistics - общая статистика;
+/help - данное сообщение.
 """
 
 @bot.message_handler(commands=['help'])
@@ -112,8 +115,8 @@ def after_text(message):
         check(message)
     if message.text == '📊 Общая статистика':
         statistics(message)
-    if message.text == '❓ Справка':
-        help(message)
+#    if message.text == '❓ Справка':
+#        help(message)
 
 #Сделать полноценное inline menu
 #Проблема в том что весь код выполняется сразу, а не после выбора пользователем.
