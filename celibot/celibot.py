@@ -48,30 +48,17 @@ def count_user():
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = types.ReplyKeyboardMarkup()
-    buttonStartTimer = types.InlineKeyboardButton('▶️ Запустить таймер', callback_data='/start_timer')
-    buttonRestartTimer = types.InlineKeyboardButton('🔄 Сбросить таймер', callback_data='/reset_timer')
-    buttonCheck = types.InlineKeyboardButton('🔎 Проверить', callback_data='/check')
-    buttonStats = types.InlineKeyboardButton('📊 Общая статистика', callback_data='/statistics')
-    buttonHelp = types.InlineKeyboardButton('❓ Справка', callback_data='/help')
+    buttonStartTimer = types.InlineKeyboardButton('▶️ Запустить таймер')
+    buttonRestartTimer = types.InlineKeyboardButton('🔄 Сбросить таймер')
+    buttonCheck = types.InlineKeyboardButton('🔎 Проверить')
+    buttonStats = types.InlineKeyboardButton('📊 Общая статистика')
+    buttonHelp = types.InlineKeyboardButton('❓ Справка')
 
     markup.row(buttonStartTimer, buttonRestartTimer)
     markup.row(buttonCheck, buttonStats)
     markup.row(buttonHelp)
 
     bot.send_message(message.chat.id, f'Меню:\n{info}', reply_markup=markup)
-
-@bot.message_handler(content_types=['text'])
-def after_text(message):
-    if message.text == '▶️ Запустить таймер':
-        start_timer(message)
-    if message.text == '🔄 Сбросить таймер':
-        reset_timer(message)
-    if message.text == '🔎 Проверить':
-        check(message)
-    if message.text == '📊 Общая статистика':
-        statistics(message)
-    if message.text == '❓ Справка':
-        help(message)
 
 @bot.message_handler(commands=['start_timer'])
 def start_timer(message):
@@ -114,6 +101,19 @@ info="""
 @bot.message_handler(commands=['help'])
 def help(message):
     bot.reply_to(message, info)
+
+@bot.message_handler(func=lambda message: True, content_types=['text'])
+def after_text(message):
+    if message.text == '▶️ Запустить таймер':
+        start_timer(message)
+    if message.text == '🔄 Сбросить таймер':
+        reset_timer(message)
+    if message.text == '🔎 Проверить':
+        check(message)
+    if message.text == '📊 Общая статистика':
+        statistics(message)
+    if message.text == '❓ Справка':
+        help(message)
 
 #Сделать полноценное inline menu
 #Проблема в том что весь код выполняется сразу, а не после выбора пользователем.
