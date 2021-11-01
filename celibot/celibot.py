@@ -47,12 +47,42 @@ def count_user():
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    markup = types.ReplyKeyboardMarkup()
+    buttonStartTimer = types.InlineKeyboardButton('▶️ Запустить таймер', callback_data='/start_timer')
+    buttonRestartTimer = types.InlineKeyboardButton('🔄 Сбросить таймер', callback_data='/reset_timer')
+    buttonCheck = types.InlineKeyboardButton('🔎 Проверить', callback_data='/check')
+    buttonStats = types.InlineKeyboardButton('📊 Общая статистика', callback_data='/statistics')
+    buttonHelp = types.InlineKeyboardButton('❓ Справка', callback_data='/help')
+
+    markup.row(buttonStartTimer, buttonRestartTimer)
+    markup.row(buttonCheck, buttonStats)
+    markup.row(buttonHelp)
+
+    bot.send_message(message.chat.id, f'Меню:\n{info}', reply_markup=markup)
+
+@bot.message_handler(content_types=['text'])
+def after_text(message):
+    if message.text == '▶️ Запустить таймер':
+        start_timer(message)
+    if message.text == '🔄 Сбросить таймер':
+        reset_timer(message)
+    if message.text == '🔎 Проверить':
+        check(message)
+    if message.text == '📊 Общая статистика':
+        statistics(message)
+    if message.text == '❓ Справка':
+        help(message)
+
+@bot.message_handler(commands=['start_timer'])
+def start_timer(message):
     if not read_user(message.from_user.id):
         write('users',message.from_user.id, datetime.now().strftime('%Y-%m-%d'))
         bot.reply_to(message, 'Время пошло')
+    else:
+        bot.reply_to(message, 'Время уже пошло. Если хочешь сбросить таймер, то используй /reset_timer')
 
-@bot.message_handler(commands=['restart'])
-def restart(message):
+@bot.message_handler(commands=['reset_timer'])
+def reset_timer(message):
     if read_user(message.from_user.id):
         update_user(message.from_user.id, datetime.now().strftime('%Y-%m-%d'))
         write('breakdowns', datetime.now().strftime('%Y-%m-%d'),message.from_user.id)
@@ -73,11 +103,12 @@ def check(message):
 def statistics(message):
     bot.reply_to(message, 'Всего участников: {}\nВыдержало: {}  ({})'.format(*count_user()))
 	
-info="""команды вводятся после /;
-start - начать воздерживаться,
-check - проверить количество дней;
-statistics - общая статистика;
-restart - обнулить дни;
+info="""
+/start - меню;
+/start_timer - запустить счётчик;
+/reset_timer - обнулить дни;
+/check - проверить количество дней;
+/statistics - общая статистика;
 """
 
 @bot.message_handler(commands=['help'])
